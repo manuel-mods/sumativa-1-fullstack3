@@ -43,7 +43,7 @@ CREATE TABLE IF NOT EXISTS topics (
 
 -- Comments table
 CREATE TABLE IF NOT EXISTS comments (
-    id SERIAL PRIMARY KEY,
+    id INTEGER PRIMARY KEY,
     content TEXT NOT NULL,
     topic_id BIGINT NOT NULL,
     user_id BIGINT NOT NULL,
