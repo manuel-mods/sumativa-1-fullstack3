@@ -7,6 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigInteger;
 import java.time.LocalDateTime;
 
 @Entity
@@ -26,7 +27,7 @@ public class Comment {
     private String content;
 
     @Column(name = "topic_id")
-    private Long topicId;
+    private Integer topicId;
 
     @Column(name = "user_id")
     private Long userId;

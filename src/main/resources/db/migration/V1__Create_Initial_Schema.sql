@@ -4,7 +4,7 @@ CREATE SCHEMA IF NOT EXISTS public;
 -- TABLES
 -- Users table
 CREATE TABLE IF NOT EXISTS users (
-    id SERIAL PRIMARY KEY,
+    id BIGINT PRIMARY KEY,
     username VARCHAR(50) NOT NULL UNIQUE,
     email VARCHAR(100) NOT NULL UNIQUE,
     password VARCHAR(100) NOT NULL,
@@ -15,7 +15,7 @@ CREATE TABLE IF NOT EXISTS users (
 
 -- Roles table
 CREATE TABLE IF NOT EXISTS roles (
-    id SERIAL PRIMARY KEY,
+    id BIGINT PRIMARY KEY,
     name VARCHAR(20) NOT NULL UNIQUE
 );
 
@@ -30,7 +30,7 @@ CREATE TABLE IF NOT EXISTS user_roles (
 
 -- Topics table
 CREATE TABLE IF NOT EXISTS topics (
-    id SERIAL PRIMARY KEY,
+    id BIGINT PRIMARY KEY,
     title VARCHAR(100) NOT NULL,
     content TEXT NOT NULL,
     user_id BIGINT NOT NULL,
@@ -43,7 +43,7 @@ CREATE TABLE IF NOT EXISTS topics (
 
 -- Comments table
 CREATE TABLE IF NOT EXISTS comments (
-    id INTEGER PRIMARY KEY,
+    id BIGINT PRIMARY KEY,
     content TEXT NOT NULL,
     topic_id BIGINT NOT NULL,
     user_id BIGINT NOT NULL,

@@ -19,10 +19,14 @@ public class CommentDto {
     @Size(min = 1, max = 2000, message = "Content must be between 1 and 2000 characters")
     private String content;
     
-    private Long topicId;
+    private Integer topicId;
     private Long userId;
     private String username;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private boolean active;
+
+    public long getAsLong(){
+        return (long) topicId;
+    }
 }
