@@ -1,6 +1,7 @@
 package dev.bast.foro.foros.controller;
 
 import dev.bast.foro.foros.dto.TopicDto;
+import dev.bast.foro.foros.dto.TopicWithCommentCountDto;
 import dev.bast.foro.foros.service.TopicService;
 import dev.bast.foro.usuarios.security.services.UserDetailsImpl;
 import io.swagger.v3.oas.annotations.Operation;
@@ -173,6 +174,18 @@ public class TopicController {
             @Parameter(description = "ID del usuario", required = true)
             @PathVariable Long userId) {
         List<TopicDto> topics = topicService.getTopicsByUserId(userId);
+        return ResponseEntity.ok(topics);
+    }
+
+    @Operation(summary = "Obtener temas ordenados por fecha con conteo de comentarios",
+               description = "Devuelve una lista de temas ordenados por fecha de creación (más recientes primero) e incluye el conteo de comentarios para cada tema")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Lista de temas ordenada recuperada con éxito",
+                    content = @Content(array = @ArraySchema(schema = @Schema(implementation = TopicWithCommentCountDto.class))))
+    })
+    @GetMapping("/by-date-with-comments")
+    public ResponseEntity<List<TopicWithCommentCountDto>> getTopicsOrderedByDateWithCommentCount() {
+        List<TopicWithCommentCountDto> topics = topicService.getTopicsOrderedByDateWithCommentCount();
         return ResponseEntity.ok(topics);
     }
 }

@@ -8,18 +8,22 @@ import org.springframework.transaction.annotation.Transactional;
 
 import dev.bast.foro.common.exception.ResourceNotFoundException;
 import dev.bast.foro.foros.dto.TopicDto;
+import dev.bast.foro.foros.dto.TopicWithCommentCountDto;
 import dev.bast.foro.foros.model.Topic;
+import dev.bast.foro.foros.repository.CommentRepository;
 import dev.bast.foro.foros.repository.TopicRepository;
 import lombok.extern.slf4j.Slf4j;
 
 @Service
 @Slf4j
 public class TopicService {
-    
-    private final TopicRepository topicRepository;
 
-    public TopicService(TopicRepository topicRepository) {
+    private final TopicRepository topicRepository;
+    private final CommentRepository commentRepository;
+
+    public TopicService(TopicRepository topicRepository, CommentRepository commentRepository) {
         this.topicRepository = topicRepository;
+        this.commentRepository = commentRepository;
     }
 
     public List<TopicDto> getAllTopics() {
@@ -89,9 +93,21 @@ public class TopicService {
 
     public List<TopicDto> getTopicsByUserId(Long userId) {
         log.info("Retrieving topics for user id: {}", userId);
-        
+
         return topicRepository.findByUserIdAndActiveIsTrue(userId).stream()
                 .map(this::convertToDto)
+                .collect(Collectors.toList());
+    }
+
+    public List<TopicWithCommentCountDto> getTopicsOrderedByDateWithCommentCount() {
+        log.info("Retrieving topics ordered by date with comment counts");
+
+        return topicRepository.findByActiveIsTrueOrderByCreatedAtDesc().stream()
+                .map(topic -> {
+                    TopicDto topicDto = convertToDto(topic);
+                    int commentCount = commentRepository.findByTopicIdAndActiveTrue(topic.getId().longValue()).size();
+                    return new TopicWithCommentCountDto(topicDto, commentCount);
+                })
                 .collect(Collectors.toList());
     }
 
