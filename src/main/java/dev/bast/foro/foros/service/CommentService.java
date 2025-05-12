@@ -50,7 +50,7 @@ public class CommentService {
     public CommentDto createComment(CommentDto commentDto, Long userId, String username) {
         log.info("Creating new comment by user: {} for topic: {}", username, commentDto.getTopicId());
         
-        if (!topicRepository.existsById(commentDto.getAsLong())) {
+        if (!topicRepository.existsById(commentDto.getTopicId().longValue())) {
             throw new ResourceNotFoundException("Topic not found with id: " + commentDto.getTopicId());
         }
         

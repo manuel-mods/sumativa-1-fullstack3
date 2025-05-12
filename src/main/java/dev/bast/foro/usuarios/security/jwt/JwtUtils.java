@@ -10,11 +10,10 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
 import dev.bast.foro.usuarios.security.services.UserDetailsImpl;
-import io.jsonwebtoken.JwtParser;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import io.jsonwebtoken.JwtParser;
 
 @Component
 public class JwtUtils {
@@ -33,7 +32,7 @@ public class JwtUtils {
                 .subject(userPrincipal.getUsername())
                 .issuedAt(new Date())
                 .expiration(new Date((new Date()).getTime() + jwtExpirationMs))
-                .signWith(getSigningKey(), SignatureAlgorithm.HS256)
+                .signWith(getSigningKey())
                 .compact();
     }
 

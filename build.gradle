@@ -2,6 +2,9 @@ plugins {
 	id 'java'
 	id 'org.springframework.boot' version '3.4.4'
 	id 'io.spring.dependency-management' version '1.1.7'
+	id "org.sonarqube" version "6.0.1.5171"
+	id 'jacoco'
+
 }
 
 group = 'dev.bast.foro'
@@ -11,6 +14,10 @@ java {
 	toolchain {
 		languageVersion = JavaLanguageVersion.of(17)
 	}
+}
+
+tasks.withType(JavaCompile) {
+	options.compilerArgs += ["-Xlint:none"]
 }
 
 configurations {
@@ -29,24 +36,74 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	implementation 'org.springframework.boot:spring-boot-starter-security'
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
-	implementation 'io.jsonwebtoken:jjwt:0.12.0'
-	implementation 'io.jsonwebtoken:jjwt-impl:0.12.0'
-	implementation 'io.jsonwebtoken:jjwt-api:0.12.0'
-	implementation 'io.jsonwebtoken:jjwt-jackson:0.12.0'
+	// Actualizado para usar versiones compatibles
+implementation 'io.jsonwebtoken:jjwt-api:0.12.5'
+implementation 'io.jsonwebtoken:jjwt-impl:0.12.5'
+implementation 'io.jsonwebtoken:jjwt-jackson:0.12.5'
 	implementation 'org.springframework.boot:spring-boot-starter-mail'
 	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
 	implementation 'org.springframework.boot:spring-boot-starter-cache'
 	implementation 'org.springframework.boot:spring-boot-starter-actuator'
 	implementation 'org.flywaydb:flyway-core'
 	implementation 'org.flywaydb:flyway-database-postgresql'
+	
+	// Swagger OpenAPI 3 documentation
+    // Update to 2.6.0 for Spring Boot 3.4.4 compatibility
+    // implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.6.0'
+    implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.2.0")
+
 
 	compileOnly 'org.projectlombok:lombok'
 	runtimeOnly 'org.postgresql:postgresql'
 	annotationProcessor 'org.projectlombok:lombok'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	testImplementation 'org.springframework.security:spring-security-test'
+
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 
 tasks.named('test') {
 	useJUnitPlatform()
+	finalizedBy jacocoTestReport
+}
+
+jacoco {
+	toolVersion = "0.8.11"
+}
+
+jacocoTestReport {
+	dependsOn test
+	reports {
+		xml.required = true
+		csv.required = false
+		html.outputLocation = layout.buildDirectory.dir('reports/jacoco')
+	}
+
+	// Excluye las clases que no quieres incluir en el análisis de cobertura
+	afterEvaluate {
+		classDirectories.setFrom(files(classDirectories.files.collect {
+			fileTree(dir: it, exclude: [
+				// 'dev/bast/foro/foros/model/*',
+				// 'dev/bast/foro/foros/dto/*',
+				// 'dev/bast/foro/usuarios/model/*',
+				// 'dev/bast/foro/usuarios/dto/*',
+				// 'dev/bast/foro/common/exception/ErrorResponse.class',
+				// 'dev/bast/foro/common/exception/MessageResponse.class',
+				// 'dev/bast/foro/common/exception/ResourceNotFoundException.class',
+				// 'dev/bast/foro/*/config/*',
+				'dev/bast/foro/foro/ForoApplication.class'
+			])
+		}))
+	}
+}
+
+
+// Tarea para ejecutar cobertura y luego análisis con SonarQube
+task testCoverageAndSonar(dependsOn: ['test', 'jacocoTestReport', 'sonar']) {
+	group = 'verification'
+	description = 'Runs tests with coverage and uploads to SonarQube'
+
+	// Se asegura de que las tareas se ejecuten en el orden correcto
+	tasks.findByName('jacocoTestReport').mustRunAfter 'test'
+	tasks.findByName('sonar').mustRunAfter 'jacocoTestReport'
 }

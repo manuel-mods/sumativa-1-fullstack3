@@ -1,0 +1,16 @@
+./gradlew sonar \
+      -Dsonar.projectKey=manuel-mods_sumativa-1-fullstack3_5b2c8a51-7936-48a5-bdbd-51528ebce3f8 \
+      -Dsonar.projectName='sumativa-1-fullstack3' \
+      -Dsonar.host.url=http://localhost:9000 \
+      -Dsonar.token=sqp_1ea241b04c63889b8369a581d6569b90c5cc9437 \
+      -Dsonar.java.source=17 \
+      -Dsonar.java.target=17 \
+      -Dsonar.scm.disabled=true \
+      -Dsonar.sources=src/main/java \
+      -Dsonar.tests=src/test/java \
+      -Dsonar.java.binaries=build/classes/java/main \
+      -Dsonar.java.test.binaries=build/classes/java/test \
+      -Dsonar.java.coveragePlugin=jacoco \
+      -Dsonar.coverage.jacoco.xmlReportPaths=build/reports/jacoco/test/jacocoTestReport.xml \
+      -Dsonar.skipNoPack=true
+
