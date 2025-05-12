@@ -3,6 +3,8 @@ package dev.bast.foro.usuarios.security;
 import dev.bast.foro.usuarios.security.jwt.AuthEntryPointJwt;
 import dev.bast.foro.usuarios.security.jwt.AuthTokenFilter;
 import dev.bast.foro.usuarios.security.services.UserDetailsServiceImpl;
+import jakarta.servlet.http.HttpServletResponse;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -55,27 +57,34 @@ public class WebSecurityConfig {
         return new BCryptPasswordEncoder();
     }
 
-    // @Bean
-    // public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-    //     http.csrf(csrf -> csrf.disable())
-    //         .exceptionHandling(exception -> exception.authenticationEntryPoint(unauthorizedHandler))
-    //         .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-    //         .authorizeHttpRequests(auth -> 
-    //             auth.requestMatchers("/api/auth/**").permitAll()
-    //                 .requestMatchers("/api/test/**").permitAll()
-    //                 .requestMatchers("/api/topics/**").permitAll()
-    //                 // Swagger UI endpoints
-    //                 .requestMatchers("/swagger-ui.html").permitAll()
-    //                 .requestMatchers("/swagger-ui/**").permitAll()
-    //                 .requestMatchers("/api-docs/**").permitAll()
-    //                 .requestMatchers("/v3/api-docs/**").permitAll()
-    //                 .requestMatchers("/actuator/**").permitAll()
-    //                 .anyRequest().authenticated()
-    //         );
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        http.csrf(csrf -> csrf.disable())
+            .exceptionHandling(exception -> exception.authenticationEntryPoint(unauthorizedHandler))
+            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+            .authorizeHttpRequests(auth -> 
+                auth.requestMatchers("/api/auth/**").permitAll()
+                    .requestMatchers("/api/test/**").permitAll()
+                    .requestMatchers("/api/comments/**").permitAll()
+                    .requestMatchers("/api/topics/**").permitAll()
+                    // Swagger UI endpoints
+                    .requestMatchers("/swagger-ui.html").permitAll()
+                    .requestMatchers("/swagger-ui/**").permitAll()
+                    .requestMatchers("/api-docs/**").permitAll()
+                    .requestMatchers("/api/api-docs/**").permitAll()
+                    .requestMatchers("/actuator/**").permitAll()
+                    .anyRequest().authenticated()
+            );
+        // manage 404 errors
+        http.exceptionHandling(exception -> exception
+            .authenticationEntryPoint(unauthorizedHandler)
+            .accessDeniedHandler((request, response, accessDeniedException) -> {
+                response.sendError(HttpServletResponse.SC_FORBIDDEN, "Access Denied");
+            })
+        );
+        http.authenticationProvider(authenticationProvider());
+        http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
         
-    //     http.authenticationProvider(authenticationProvider());
-    //     http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
-        
-    //     return http.build();
-    // }
+        return http.build();
+    }
 }
